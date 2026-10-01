@@ -1,0 +1,6 @@
+{
+  "name": "CurriculoMatch - Gestor de CVs Adaptados",
+  "description": "Gestiona tu CV general y crea versiones personalizadas adaptadas a cada oferta de empleo, reclutador y empresa.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
