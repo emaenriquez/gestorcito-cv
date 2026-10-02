@@ -11,29 +11,67 @@
 }
 
 @media print {
-  /* Hide non-printable elements */
-  nav, header, aside, .no-print, button, .tabs-container {
+  /* Margin 0 quita cabecera/pie del navegador (fecha, título, localhost). */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html,
+  body,
+  #root {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  nav,
+  header,
+  aside,
+  footer,
+  .no-print,
+  button,
+  .tabs-container {
     display: none !important;
   }
 
-  body {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-    margin: 0 !important;
-    padding: 0 !important;
+  body * {
+    visibility: hidden;
   }
 
-  .print-page-container {
+  #cv-printable-sheet,
+  #cv-printable-sheet * {
+    visibility: visible;
+  }
+
+  #cv-printable-sheet.print-page-container {
+    position: absolute;
+    inset: 0;
     box-shadow: none !important;
     border: none !important;
+    border-radius: 0 !important;
     margin: 0 !important;
-    padding: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
+    max-width: none !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    /* Mismos márgenes visuales que la vista previa (p-8 / p-12). */
+    padding: 32px 36px !important;
+    background: #ffffff !important;
+    overflow: visible !important;
   }
 
-  @page {
-    size: A4;
-    margin: 1.2cm 1.4cm;
+  #cv-printable-sheet ul {
+    list-style-type: disc;
+    list-style-position: outside;
+  }
+
+  #cv-printable-sheet li::marker {
+    font-weight: 400;
+    color: #334155;
   }
 }

@@ -19,13 +19,10 @@ interface CVContextType {
   updateAdaptedCVCVData: (id: string, updatedData: MasterCV) => void;
   duplicateAdaptedCV: (id: string, newReference: string) => string;
   deleteAdaptedCV: (id: string) => void;
-  resetToDefaults: () => void;
-  exportBackupJSON: () => void;
-  importBackupJSON: (jsonStr: string) => boolean;
 }
 
-const STORAGE_KEY_MASTER = 'curriculomatch_master_cv_v1';
-const STORAGE_KEY_ADAPTED = 'curriculomatch_adapted_cvs_v1';
+const STORAGE_KEY_MASTER = 'curriculomatch_master_cv_v2';
+const STORAGE_KEY_ADAPTED = 'curriculomatch_adapted_cvs_v2';
 
 const CVContext = createContext<CVContextType | null>(null);
 
@@ -183,44 +180,6 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setAdaptedCVs(prev => prev.filter(item => item.id !== id));
   };
 
-  const resetToDefaults = () => {
-    setMasterCV(DEFAULT_MASTER_CV);
-    setAdaptedCVs(DEFAULT_ADAPTED_CVS);
-  };
-
-  const exportBackupJSON = () => {
-    const data = {
-      version: '1.0',
-      exportedAt: new Date().toISOString(),
-      masterCV,
-      adaptedCVs,
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `curriculomatch-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const importBackupJSON = (jsonStr: string): boolean => {
-    try {
-      const data = JSON.parse(jsonStr);
-      if (data.masterCV && Array.isArray(data.adaptedCVs)) {
-        setMasterCV(data.masterCV);
-        setAdaptedCVs(data.adaptedCVs);
-        return true;
-      }
-      return false;
-    } catch (e) {
-      console.error('Failed to import JSON backup:', e);
-      return false;
-    }
-  };
-
   return (
     <CVContext.Provider
       value={{
@@ -233,9 +192,6 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         updateAdaptedCVCVData,
         duplicateAdaptedCV,
         deleteAdaptedCV,
-        resetToDefaults,
-        exportBackupJSON,
-        importBackupJSON,
       }}
     >
       {children}

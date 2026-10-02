@@ -44,6 +44,22 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ initialSelectedId }) => {
   }
 
   const handlePrint = () => {
+    const previousTitle = document.title;
+    const safeName = (activeCVData.personal.fullName || 'CV')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\w\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-');
+
+    // El título del documento es lo que Chrome pone en cabecera y en el nombre del PDF.
+    document.title = safeName || 'CV';
+
+    const restoreTitle = () => {
+      document.title = previousTitle;
+    };
+
+    window.addEventListener('afterprint', restoreTitle, { once: true });
     window.print();
   };
 

@@ -16,10 +16,10 @@ export const NewAdaptedModal: React.FC<NewAdaptedModalProps> = ({
 }) => {
   const { adaptedCVs, createAdaptedCV } = useCV();
 
-  const [reference, setReference] = useState('Empresa X - Martín RRHH');
-  const [company, setCompany] = useState('Empresa X');
-  const [recruiter, setRecruiter] = useState('Martín (RRHH)');
-  const [targetRole, setTargetRole] = useState('Lead Frontend Developer');
+  const [reference, setReference] = useState('');
+  const [company, setCompany] = useState('');
+  const [recruiter, setRecruiter] = useState('');
+  const [targetRole, setTargetRole] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [cloneFromId, setCloneFromId] = useState<string>('master');
   const [template, setTemplate] = useState<CVTemplateType>('modern');

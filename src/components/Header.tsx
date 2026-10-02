@@ -1,15 +1,11 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import {
   FileText,
   Briefcase,
   Eye,
   GitCompare,
   Plus,
-  Download,
-  Upload,
-  RotateCcw,
 } from 'lucide-react';
-import { useCV } from '../context/CVContext';
 
 export type ActiveTab = 'master' | 'adapted' | 'preview' | 'compare';
 
@@ -26,34 +22,6 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenNewAdaptedModal,
   adaptedCount,
 }) => {
-  const { exportBackupJSON, importBackupJSON, resetToDefaults } = useCV();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      if (content) {
-        const success = importBackupJSON(content);
-        if (success) {
-          alert('Datos importados correctamente.');
-        } else {
-          alert('Error: El archivo JSON no tiene el formato válido de CurriculoMatch.');
-        }
-      }
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  };
-
-  const handleReset = () => {
-    if (confirm('¿Restaurar los datos de ejemplo predeterminados? Se mantendrán ejemplos como Empresa X - Martín RRHH.')) {
-      resetToDefaults();
-    }
-  };
-
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-slate-200">
       {/* 3-Zone Top Bar Contract */}
@@ -121,38 +89,6 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Zone 3: 1-2 primary actions */}
         <div className="flex items-center gap-2">
-          {/* Quick options menu */}
-          <div className="hidden lg:flex items-center gap-1 border-r border-slate-200 pr-2 mr-1">
-            <button
-              onClick={exportBackupJSON}
-              title="Descargar copia de seguridad en JSON"
-              className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition-colors text-xs"
-            >
-              <Download className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              title="Importar copia de seguridad JSON"
-              className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition-colors text-xs"
-            >
-              <Upload className="w-4 h-4" />
-            </button>
-            <button
-              onClick={handleReset}
-              title="Restaurar datos de prueba iniciales"
-              className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition-colors text-xs"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-          </div>
-
           <button
             onClick={onOpenNewAdaptedModal}
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg transition-colors whitespace-nowrap shadow-sm"
