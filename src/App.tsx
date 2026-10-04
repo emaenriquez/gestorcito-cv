@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CVProvider, useCV } from './context/CVContext';
 import { Header, ActiveTab } from './components/Header';
 import { MasterCVEditor } from './components/MasterCVEditor';
@@ -13,69 +13,86 @@ import { CVPreview } from './components/CVPreview';
 import { CVComparator } from './components/CVComparator';
 import { NewAdaptedModal } from './components/NewAdaptedModal';
 
+function parseRoute(hash: string): { tab: ActiveTab; editingId: string | null } {
+  const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  if (parts[0] === 'adapted') {
+    return { tab: 'adapted', editingId: parts[1] ?? null };
+  }
+  if (parts[0] === 'preview') return { tab: 'preview', editingId: null };
+  if (parts[0] === 'compare') return { tab: 'compare', editingId: null };
+  // CV Maestro is the main page: '/' and unknown routes land here.
+  return { tab: 'master', editingId: null };
+}
+
 function MainApp() {
   const { adaptedCVs } = useCV();
-  const [activeTab, setActiveTab] = useState<ActiveTab>('adapted');
-  const [editingAdaptedId, setEditingAdaptedId] = useState<string | null>(null);
+  const [hash, setHash] = useState(() => window.location.hash);
   const [selectedPreviewId, setSelectedPreviewId] = useState<string>('master');
   const [selectedCompareId, setSelectedCompareId] = useState<string>('');
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
 
-  // When opening a new adapted CV, close editor and open modal
+  // Keep the rendered page in sync with the URL hash.
+  useEffect(() => {
+    const onChange = () => setHash(window.location.hash);
+    window.addEventListener('hashchange', onChange);
+    return () => window.removeEventListener('hashchange', onChange);
+  }, []);
+
+  const route = parseRoute(hash);
+  const activeTab = route.tab;
+  const editingAdaptedId = route.editingId;
+
+  const navigate = (tab: ActiveTab, id?: string) => {
+    const target = id ? `#/${tab}/${id}` : `#/${tab}`;
+    if (window.location.hash !== target) {
+      window.location.hash = target;
+    }
+  };
+
   const handleOpenNewModal = () => {
     setIsNewModalOpen(true);
   };
 
   const handleCreatedNewAdapted = (newId: string) => {
-    setActiveTab('adapted');
-    setEditingAdaptedId(newId);
+    navigate('adapted', newId);
   };
 
   const handleEditAdapted = (id: string) => {
-    setActiveTab('adapted');
-    setEditingAdaptedId(id);
+    navigate('adapted', id);
   };
 
   const handlePreviewAdapted = (id: string) => {
     setSelectedPreviewId(id);
-    setActiveTab('preview');
+    navigate('preview');
   };
 
   const handleCompareAdapted = (id: string) => {
     setSelectedCompareId(id);
-    setActiveTab('compare');
-  };
-
-  const handleTabChange = (tab: ActiveTab) => {
-    setActiveTab(tab);
-    // If navigating to adapted tab from another tab, reset editing mode if not already editing
-    if (tab !== 'adapted') {
-      setEditingAdaptedId(null);
-    }
+    navigate('compare');
   };
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col text-slate-900">
       <Header
         activeTab={activeTab}
-        setActiveTab={handleTabChange}
+        setActiveTab={navigate}
         onOpenNewAdaptedModal={handleOpenNewModal}
         adaptedCount={adaptedCVs.length}
       />
 
       <main className="flex-1">
-        {/* TAB 1: CV MAESTRO (INFORMACIÓN GENERAL) */}
+        {/* PÁGINA PRINCIPAL: CV MAESTRO (INFORMACIÓN GENERAL) */}
         {activeTab === 'master' && (
           <MasterCVEditor onStartAdaptedCV={handleOpenNewModal} />
         )}
 
-        {/* TAB 2: CVS ADAPTADOS POR OFERTA */}
+        {/* CVS ADAPTADOS POR OFERTA */}
         {activeTab === 'adapted' && (
           <>
             {editingAdaptedId ? (
               <AdaptedCVEditor
                 cvId={editingAdaptedId}
-                onBack={() => setEditingAdaptedId(null)}
+                onBack={() => navigate('adapted')}
                 onPreview={(id) => handlePreviewAdapted(id)}
               />
             ) : (
@@ -89,12 +106,12 @@ function MainApp() {
           </>
         )}
 
-        {/* TAB 3: VISTA PREVIA & PDF EXPORT */}
+        {/* VISTA PREVIA & PDF EXPORT */}
         {activeTab === 'preview' && (
           <CVPreview initialSelectedId={selectedPreviewId} />
         )}
 
-        {/* TAB 4: COMPARADOR MASTER VS ADAPTADO */}
+        {/* COMPARADOR MASTER VS ADAPTADO */}
         {activeTab === 'compare' && (
           <CVComparator
             initialAdaptedId={selectedCompareId}

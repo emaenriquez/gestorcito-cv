@@ -678,11 +678,10 @@ export const MasterCVEditor: React.FC<MasterCVEditorProps> = ({ onStartAdaptedCV
                               </label>
                               <input
                                 type="text"
-                                disabled={exp.current}
-                                value={exp.current ? 'Actual' : exp.endDate}
-                                placeholder="2024-05"
-                                onChange={(e) => handleUpdateExperience(exp.id, { endDate: e.target.value })}
-                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-md bg-white text-slate-800 font-mono disabled:bg-slate-100 disabled:text-slate-400"
+                                value={exp.endDate}
+                                placeholder={exp.current ? 'Actual' : '2024-05'}
+                                onChange={(e) => handleUpdateExperience(exp.id, { endDate: e.target.value, current: false })}
+                                className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-md bg-white text-slate-800 font-mono"
                               />
                             </div>
                           </div>
